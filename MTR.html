@@ -172,7 +172,7 @@
         <!-- Players View -->
         <section id="view-players" class="hidden space-y-4">
             <div class="bg-slate-950/80 rounded-2xl border border-slate-800 p-5 shadow-xl flex items-center justify-between">
-                <h2 class="font-bold text-lg text-white flex items-center gap-2"><i class="fa-solid fa-users text-sky-400"></i> League Roster (64 Players)</h2>
+                <h2 class="font-bold text-lg text-white flex items-center gap-2"><i class="fa-solid fa-users text-sky-400"></i> League Roster (16 Players)</h2>
                 <button onclick="randomizePlayerNames()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center gap-2">
                     <i class="fa-solid fa-shuffle"></i> Randomize Names
                 </button>
@@ -293,7 +293,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
     <script>
-        const defaultPlayers = Array.from({ length: 64 }, (_, i) => ({
+        const defaultPlayers = Array.from({ length: 16 }, (_, i) => ({
             id: i + 1,
             name: `Player ${i + 1}`
         }));
@@ -310,7 +310,7 @@
         let db = null;
         let auth = null;
         let isCloudSynced = false;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'st-ranking-v12';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'st-ranking-v12-16p';
 
         const defaultFirebaseConfig = {
             apiKey: "AIzaSyB4zGGTpIdB2oiieeKZ-6TPA7ic9fxnnlc",
@@ -340,7 +340,7 @@
         }
 
         window.initApp = async function() {
-            let savedConfig = localStorage.getItem('st_ranking_fb_config');
+            let savedConfig = localStorage.getItem('st_ranking_fb_config_16p');
             let configToUse = savedConfig ? JSON.parse(savedConfig) : defaultFirebaseConfig;
 
             document.getElementById('fb-apikey').value = configToUse.apiKey || '';
@@ -382,11 +382,11 @@
         };
 
         function loadLocalState() {
-            const saved = localStorage.getItem('st_ranking_local_v12');
+            const saved = localStorage.getItem('st_ranking_local_v12_16p');
             if (saved) {
                 try {
                     state = JSON.parse(saved);
-                    if (!state.players || state.players.length !== 64) {
+                    if (!state.players || state.players.length !== 16) {
                         loadDefaults();
                         return;
                     }
@@ -453,7 +453,7 @@
             docRef.onSnapshot((docSnap) => {
                 if (docSnap.exists) {
                     state = docSnap.data();
-                    if (!state.players || state.players.length !== 64) {
+                    if (!state.players || state.players.length !== 16) {
                         loadDefaults();
                         return;
                     }
@@ -481,7 +481,7 @@
                     console.error("Error writing to cloud:", e);
                 }
             } else {
-                localStorage.setItem('st_ranking_local_v12', JSON.stringify(state));
+                localStorage.setItem('st_ranking_local_v12_16p', JSON.stringify(state));
             }
             renderAll();
         };
@@ -510,7 +510,7 @@
                 return;
             }
 
-            localStorage.setItem('st_ranking_fb_config', JSON.stringify(cfg));
+            localStorage.setItem('st_ranking_fb_config_16p', JSON.stringify(cfg));
             showToast("Firebase config saved! Reloading...", "success");
             setTimeout(() => window.location.reload(), 1000);
         };
@@ -520,7 +520,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `st_ranking_backup_${new Date().toISOString().slice(0,10)}.json`);
+            downloadAnchor.setAttribute("download", `st_ranking_16p_backup_${new Date().toISOString().slice(0,10)}.json`);
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
@@ -910,8 +910,8 @@
         };
 
         window.randomizePlayerNames = function() {
-            const firstNames = ["Alexander", "Benjamin", "Christian", "Dominic", "Emil", "Felix", "Gabriel", "Hugo", "Ivan", "Julian", "Lucas", "Matteo", "Nathan", "Oliver", "Pablo", "Quentin", "Roman", "Sebastian", "Theo", "Ulysses", "Victor", "Wesley", "Xavier", "Yusuf", "Zachary"];
-            const lastNames = ["Adams", "Baker", "Carter", "Davis", "Evans", "Foster", "Garcia", "Harris", "Ingram", "Jones", "King", "Lewis", "Moore", "Nelson", "Owens", "Parker", "Quinn", "Roberts", "Smith", "Turner", "Underwood", "Vaughn", "Walker", "Young", "Zimmerman"];
+            const firstNames = ["Alexander", "Benjamin", "Christian", "Dominic", "Emil", "Felix", "Gabriel", "Hugo", "Ivan", "Julian", "Lucas", "Matteo", "Nathan", "Oliver", "Pablo", "Quentin"];
+            const lastNames = ["Adams", "Baker", "Carter", "Davis", "Evans", "Foster", "Garcia", "Harris", "Ingram", "Jones", "King", "Lewis", "Moore", "Nelson", "Owens", "Parker"];
 
             let shuffledNames = [];
             while (shuffledNames.length < state.players.length) {
