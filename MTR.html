@@ -43,18 +43,20 @@
                 </div>
             </div>
 
-            <!-- Desktop Navigation -->
+            <!-- Desktop Navigation (Attendance First) -->
             <nav class="hidden md:flex items-center gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800">
-                <button id="nav-standings" onclick="switchTab('standings')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-tennis-600 text-white shadow-sm flex items-center gap-2"><i class="fa-solid fa-trophy"></i> Standings</button>
+                <button id="nav-attendance" onclick="switchTab('attendance')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-tennis-600 text-white shadow-sm flex items-center gap-2"><i class="fa-solid fa-calendar-check"></i> Attendance</button>
+                <button id="nav-standings" onclick="switchTab('standings')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-2"><i class="fa-solid fa-trophy"></i> Standings</button>
                 <button id="nav-fixtures" onclick="switchTab('fixtures')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-2"><i class="fa-solid fa-calendar-days"></i> Fixtures</button>
                 <button id="nav-results" onclick="switchTab('results')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-poll-vertical"></i> Results</button>
                 <button id="nav-players" onclick="switchTab('players')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-2"><i class="fa-solid fa-users"></i> Players</button>
             </nav>
         </div>
 
-        <!-- Mobile Navigation -->
+        <!-- Mobile Navigation (Attendance First) -->
         <div class="md:hidden flex overflow-x-auto px-4 pb-3 gap-2 no-scrollbar border-t border-slate-800/60 pt-2">
-            <button id="mob-nav-standings" onclick="switchTab('standings')" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap bg-tennis-600 text-white">Standings</button>
+            <button id="mob-nav-attendance" onclick="switchTab('attendance')" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap bg-tennis-600 text-white">Attendance</button>
+            <button id="mob-nav-standings" onclick="switchTab('standings')" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 bg-slate-900">Standings</button>
             <button id="mob-nav-fixtures" onclick="switchTab('fixtures')" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 bg-slate-900">Fixtures</button>
             <button id="mob-nav-results" onclick="switchTab('results')" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 bg-slate-900">Results</button>
             <button id="mob-nav-players" onclick="switchTab('players')" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 bg-slate-900">Players</button>
@@ -95,8 +97,66 @@
             </div>
         </div>
 
+        <!-- Attendance Calendar View (Default View / First Position) -->
+        <section id="view-attendance" class="space-y-6">
+            <div class="bg-slate-950/80 rounded-2xl border border-slate-800 p-6 shadow-xl">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <h2 class="font-bold text-lg text-white flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-check text-tennis-400"></i> Player Attendance Calendar
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">Select any date to log or view attendance records for the 16 players.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="changeMonth(-1)" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-700 text-xs font-semibold transition"><i class="fa-solid fa-chevron-left"></i> Prev</button>
+                        <span id="calendar-month-year" class="text-sm font-bold text-white min-w-[140px] text-center">Month Year</span>
+                        <button onclick="changeMonth(1)" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-700 text-xs font-semibold transition">Next <i class="fa-solid fa-chevron-right"></i></button>
+                        <button onclick="goToCurrentMonth()" class="px-3 py-2 bg-tennis-600 hover:bg-tennis-500 text-white rounded-xl text-xs font-bold transition">Today</button>
+                    </div>
+                </div>
+
+                <!-- Calendar Grid -->
+                <div class="grid grid-cols-7 gap-2 text-center mb-2">
+                    <div class="text-xs font-bold text-slate-500 uppercase">Sun</div>
+                    <div class="text-xs font-bold text-slate-500 uppercase">Mon</div>
+                    <div class="text-xs font-bold text-slate-500 uppercase">Tue</div>
+                    <div class="text-xs font-bold text-slate-500 uppercase">Wed</div>
+                    <div class="text-xs font-bold text-slate-500 uppercase">Thu</div>
+                    <div class="text-xs font-bold text-slate-500 uppercase">Fri</div>
+                    <div class="text-xs font-bold text-slate-500 uppercase">Sat</div>
+                </div>
+                <div id="calendar-days-grid" class="grid grid-cols-7 gap-2"></div>
+            </div>
+
+            <!-- Daily Attendance Details Panel -->
+            <div id="daily-attendance-panel" class="bg-slate-950/80 rounded-2xl border border-slate-800 p-6 shadow-xl hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800 mb-4">
+                    <div>
+                        <h3 id="selected-date-title" class="font-bold text-white text-base">Attendance for Date</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Click status buttons to toggle attendance for each player.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="markAllAttendance('Present')" class="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg border border-emerald-500/30 transition">Mark All Present</button>
+                        <button onclick="markAllAttendance('Absent')" class="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold rounded-lg border border-rose-500/30 transition">Mark All Absent</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-900 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-800">
+                            <tr>
+                                <th class="py-3 px-4">ID</th>
+                                <th class="py-3 px-6">Player Name</th>
+                                <th class="py-3 px-6 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="daily-attendance-tbody" class="divide-y divide-slate-800/60"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <!-- Standings View -->
-        <section id="view-standings" class="space-y-4">
+        <section id="view-standings" class="hidden space-y-4">
             <div class="bg-slate-950/80 rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
                 <div class="p-5 border-b border-slate-800 flex justify-between items-center">
                     <h2 class="font-bold text-lg text-white flex items-center gap-2"><i class="fa-solid fa-trophy text-amber-400"></i> League Table</h2>
@@ -304,8 +364,12 @@
             players: JSON.parse(JSON.stringify(defaultPlayers)),
             matches: [],
             fixturePlayer1Id: 1,
-            fixturePlayer2Id: 2
+            fixturePlayer2Id: 2,
+            attendance: {} 
         };
+
+        let currentCalendarDate = new Date();
+        let selectedDateStr = null;
 
         let db = null;
         let auth = null;
@@ -392,6 +456,7 @@
                     }
                     if (state.fixturePlayer1Id === undefined) state.fixturePlayer1Id = 1;
                     if (state.fixturePlayer2Id === undefined) state.fixturePlayer2Id = 2;
+                    if (!state.attendance) state.attendance = {};
                 } catch (e) {
                     loadDefaults();
                 }
@@ -405,6 +470,7 @@
             state.matches = generateRoundRobinSchedule(state.players);
             state.fixturePlayer1Id = 1;
             state.fixturePlayer2Id = 2;
+            state.attendance = {};
             persistState();
         }
 
@@ -462,6 +528,7 @@
                     }
                     if (state.fixturePlayer1Id === undefined) state.fixturePlayer1Id = 1;
                     if (state.fixturePlayer2Id === undefined) state.fixturePlayer2Id = 2;
+                    if (!state.attendance) state.attendance = {};
                     renderAll();
                 } else {
                     loadDefaults();
@@ -544,6 +611,7 @@
                     state = importedState;
                     if (state.fixturePlayer1Id === undefined) state.fixturePlayer1Id = 1;
                     if (state.fixturePlayer2Id === undefined) state.fixturePlayer2Id = 2;
+                    if (!state.attendance) state.attendance = {};
                     persistState();
                     showToast("Ranking data imported successfully!", "success");
                 } catch (err) {
@@ -555,16 +623,30 @@
         };
 
         window.switchTab = function(tabName) {
-            const tabs = ['standings', 'fixtures', 'players', 'results'];
+            const tabs = ['attendance', 'standings', 'fixtures', 'results', 'players'];
             tabs.forEach(t => {
-                document.getElementById(`view-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-2";
-                document.getElementById(`mob-nav-${t}`).className = "px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 bg-slate-900";
+                const viewEl = document.getElementById(`view-${t}`);
+                if (viewEl) viewEl.classList.add('hidden');
+                
+                const navEl = document.getElementById(`nav-${t}`);
+                if (navEl) navEl.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-2";
+                
+                const mobEl = document.getElementById(`mob-nav-${t}`);
+                if (mobEl) mobEl.className = "px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 bg-slate-900";
             });
 
-            document.getElementById(`view-${tabName}`).classList.remove('hidden');
-            document.getElementById(`nav-${tabName}`).className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-tennis-600 text-white shadow-sm flex items-center gap-2";
-            document.getElementById(`mob-nav-${tabName}`).className = "px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap bg-tennis-600 text-white";
+            const targetView = document.getElementById(`view-${tabName}`);
+            if (targetView) targetView.classList.remove('hidden');
+
+            const targetNav = document.getElementById(`nav-${tabName}`);
+            if (targetNav) targetNav.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-tennis-600 text-white shadow-sm flex items-center gap-2";
+
+            const targetMob = document.getElementById(`mob-nav-${tabName}`);
+            if (targetMob) targetMob.className = "px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap bg-tennis-600 text-white";
+
+            if (tabName === 'attendance') {
+                renderCalendar();
+            }
         };
 
         function renderAll() {
@@ -574,7 +656,170 @@
             renderPlayers();
             renderResults();
             updateStatsBadge();
+            if (!document.getElementById('view-attendance').classList.contains('hidden')) {
+                renderCalendar();
+            }
         }
+
+        // Calendar & Attendance Functions
+        window.changeMonth = function(direction) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+            renderCalendar();
+        };
+
+        window.goToCurrentMonth = function() {
+            currentCalendarDate = new Date();
+            renderCalendar();
+        };
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-days-grid');
+            const monthYearLabel = document.getElementById('calendar-month-year');
+            if (!grid || !monthYearLabel) return;
+
+            grid.innerHTML = '';
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            monthYearLabel.textContent = `${monthNames[month]} ${year}`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const prevTotalDays = new Date(year, month, 0).getDate();
+
+            const todayStr = new Date().toISOString().slice(0, 10);
+
+            for (let i = firstDayIndex - 1; i >= 0; i--) {
+                let dayNum = prevTotalDays - i;
+                let cell = document.createElement('div');
+                cell.className = "bg-slate-900/30 border border-slate-800/40 rounded-xl p-3 text-slate-600 text-xs min-h-[85px] flex flex-col justify-between select-none opacity-40";
+                cell.innerHTML = `<span class="font-bold">${dayNum}</span>`;
+                grid.appendChild(cell);
+            }
+
+            for (let day = 1; day <= totalDays; day++) {
+                let monthStr = String(month + 1).padStart(2, '0');
+                let dayStr = String(day).padStart(2, '0');
+                let dateKey = `${year}-${monthStr}-${dayStr}`;
+
+                let dayAttendance = (state.attendance && state.attendance[dateKey]) || {};
+                let presentCount = Object.values(dayAttendance).filter(v => v === 'Present').length;
+                let absentCount = Object.values(dayAttendance).filter(v => v === 'Absent').length;
+                let lateCount = Object.values(dayAttendance).filter(v => v === 'Late').length;
+
+                let isToday = (dateKey === todayStr);
+                let isSelected = (dateKey === selectedDateStr);
+
+                let borderClass = isSelected ? 'border-tennis-500 ring-2 ring-tennis-500/30 bg-slate-900' : (isToday ? 'border-tennis-500/60 bg-slate-900' : 'border-slate-800 bg-slate-950/60 hover:border-slate-700');
+
+                let badgeHtml = '';
+                if (Object.keys(dayAttendance).length > 0) {
+                    badgeHtml = `
+                        <div class="flex items-center justify-center gap-1 mt-1 text-[10px] font-bold">
+                            ${presentCount > 0 ? `<span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">${presentCount}P</span>` : ''}
+                            ${lateCount > 0 ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">${lateCount}L</span>` : ''}
+                            ${absentCount > 0 ? `<span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400">${absentCount}A</span>` : ''}
+                        </div>
+                    `;
+                } else {
+                    badgeHtml = `<div class="text-[10px] text-slate-600 italic mt-1">No records</div>`;
+                }
+
+                let cell = document.createElement('div');
+                cell.className = `rounded-xl border ${borderClass} p-2.5 text-xs flex flex-col justify-between cursor-pointer transition`;
+                cell.onclick = () => selectCalendarDate(dateKey);
+                cell.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold ${isToday ? 'bg-tennis-500 text-slate-950 w-6 h-6 rounded-full flex items-center justify-center' : 'text-slate-200'}">${day}</span>
+                        ${isToday ? '<span class="text-[9px] font-bold text-tennis-400">Today</span>' : ''}
+                    </div>
+                    ${badgeHtml}
+                `;
+                grid.appendChild(cell);
+            }
+
+            let totalCellsRendered = firstDayIndex + totalDays;
+            let nextMonthDays = totalCellsRendered <= 35 ? 35 - totalCellsRendered : 42 - totalCellsRendered;
+            for (let i = 1; i <= nextMonthDays; i++) {
+                let cell = document.createElement('div');
+                cell.className = "bg-slate-900/30 border border-slate-800/40 rounded-xl p-3 text-slate-600 text-xs min-h-[85px] flex flex-col justify-between select-none opacity-40";
+                cell.innerHTML = `<span class="font-bold">${i}</span>`;
+                grid.appendChild(cell);
+            }
+        }
+
+        window.selectCalendarDate = function(dateKey) {
+            selectedDateStr = dateKey;
+            renderCalendar();
+
+            const panel = document.getElementById('daily-attendance-panel');
+            const titleEl = document.getElementById('selected-date-title');
+            if (!panel || !titleEl) return;
+
+            panel.classList.remove('hidden');
+            let dateObj = new Date(dateKey + 'T00:00:00');
+            titleEl.textContent = `Attendance Roster for ${dateObj.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' })}`;
+
+            renderDailyAttendanceTable();
+        };
+
+        function renderDailyAttendanceTable() {
+            const tbody = document.getElementById('daily-attendance-tbody');
+            if (!tbody || !selectedDateStr) return;
+            tbody.innerHTML = '';
+
+            if (!state.attendance) state.attendance = {};
+            if (!state.attendance[selectedDateStr]) state.attendance[selectedDateStr] = {};
+
+            let dayRecord = state.attendance[selectedDateStr];
+
+            state.players.forEach(pl => {
+                let status = dayRecord[pl.id] || 'Unmarked';
+
+                let presentClass = status === 'Present' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-900 text-slate-400 hover:bg-slate-800';
+                let lateClass = status === 'Late' ? 'bg-amber-600 text-white shadow-sm' : 'bg-slate-900 text-slate-400 hover:bg-slate-800';
+                let absentClass = status === 'Absent' ? 'bg-rose-600 text-white shadow-sm' : 'bg-slate-900 text-slate-400 hover:bg-slate-800';
+                let excusedClass = status === 'Excused' ? 'bg-sky-600 text-white shadow-sm' : 'bg-slate-900 text-slate-400 hover:bg-slate-800';
+
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-900/60 transition border-b border-slate-800/40";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-bold text-tennis-400">#${pl.id}</td>
+                    <td class="py-3 px-6 font-bold text-white">${pl.name}</td>
+                    <td class="py-3 px-6 text-center">
+                        <div class="inline-flex rounded-xl p-1 bg-slate-950 border border-slate-800 gap-1">
+                            <button onclick="setPlayerAttendance(${pl.id}, 'Present')" class="px-3 py-1 rounded-lg text-xs font-bold transition ${presentClass}">Present</button>
+                            <button onclick="setPlayerAttendance(${pl.id}, 'Late')" class="px-3 py-1 rounded-lg text-xs font-bold transition ${lateClass}">Late</button>
+                            <button onclick="setPlayerAttendance(${pl.id}, 'Absent')" class="px-3 py-1 rounded-lg text-xs font-bold transition ${absentClass}">Absent</button>
+                            <button onclick="setPlayerAttendance(${pl.id}, 'Excused')" class="px-3 py-1 rounded-lg text-xs font-bold transition ${excusedClass}">Excused</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.setPlayerAttendance = function(playerId, status) {
+            if (!selectedDateStr) return;
+            if (!state.attendance[selectedDateStr]) state.attendance[selectedDateStr] = {};
+            state.attendance[selectedDateStr][playerId] = status;
+            persistState();
+            renderDailyAttendanceTable();
+            renderCalendar();
+        };
+
+        window.markAllAttendance = function(status) {
+            if (!selectedDateStr) return;
+            if (!state.attendance[selectedDateStr]) state.attendance[selectedDateStr] = {};
+            state.players.forEach(pl => {
+                state.attendance[selectedDateStr][pl.id] = status;
+            });
+            persistState();
+            renderDailyAttendanceTable();
+            renderCalendar();
+            showToast(`Marked all players as ${status} for ${selectedDateStr}`, "success");
+        };
 
         function calculateStandings() {
             let stats = {};
