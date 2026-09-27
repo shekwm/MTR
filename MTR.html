@@ -67,7 +67,7 @@
 
     <main class="max-w-7xl mx-auto px-4 mt-6">
 
-        <!-- Attendance Calendar View (Default View / First Position) -->
+        <!-- Attendance Calendar View -->
         <section id="view-attendance" class="space-y-6">
             <div class="bg-slate-950/80 rounded-2xl border border-slate-800 p-6 shadow-xl">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -75,7 +75,7 @@
                         <h2 class="font-bold text-lg text-white flex items-center gap-2">
                             <i class="fa-solid fa-calendar-check text-tennis-400"></i> Player Attendance Calendar
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">Select any date to log or view attendance records and court locations for the 16 players.</p>
+                        <p class="text-xs text-slate-400 mt-1">Select any date to log attendance, excuse status, and court locations for the 16 players.</p>
                     </div>
                     <div class="flex items-center gap-3">
                         <button onclick="changeMonth(-1)" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-700 text-xs font-semibold transition"><i class="fa-solid fa-chevron-left"></i> Prev</button>
@@ -103,7 +103,7 @@
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-800 mb-4">
                     <div>
                         <h3 id="selected-date-title" class="font-bold text-white text-base">Attendance for Date</h3>
-                        <p class="text-xs text-slate-400 mt-0.5">Toggle attendance status for players and specify location.</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Toggle Present, Excused, or clear status for players and specify location.</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
                         <div class="flex items-center gap-2 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-xl">
@@ -111,6 +111,7 @@
                             <input type="text" id="daily-location-input" oninput="saveDailyLocation()" placeholder="Enter venue / court location..." class="bg-transparent text-xs text-white focus:outline-none w-48">
                         </div>
                         <button onclick="markAllAttendance('Present')" class="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg border border-emerald-500/30 transition">Mark All Present</button>
+                        <button onclick="markAllAttendance('Excused')" class="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-bold rounded-lg border border-amber-500/30 transition">Mark All Excused</button>
                         <button onclick="clearAllAttendance()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg border border-slate-700 transition">Clear All</button>
                     </div>
                 </div>
@@ -120,7 +121,7 @@
                             <tr>
                                 <th class="py-3 px-4">ID</th>
                                 <th class="py-3 px-6">Player Name</th>
-                                <th class="py-3 px-6 text-center">Status</th>
+                                <th class="py-3 px-6 text-center">Status Action</th>
                             </tr>
                         </thead>
                         <tbody id="daily-attendance-tbody" class="divide-y divide-slate-800/60"></tbody>
@@ -728,6 +729,7 @@
 
                 let dayAttendance = (state.attendance && state.attendance[dateKey]) || {};
                 let presentCount = Object.values(dayAttendance).filter(v => v === 'Present').length;
+                let excusedCount = Object.values(dayAttendance).filter(v => v === 'Excused').length;
                 let locationName = (state.attendanceLocations && state.attendanceLocations[dateKey]) || '';
 
                 let isToday = (dateKey === todayStr);
@@ -736,8 +738,11 @@
                 let borderClass = isSelected ? 'border-tennis-500 ring-2 ring-tennis-500/30 bg-slate-900' : (isToday ? 'border-tennis-500/60 bg-slate-900' : 'border-slate-800 bg-slate-950/60 hover:border-slate-700');
 
                 let badgeHtml = '';
-                if (presentCount > 0) {
-                    badgeHtml += `<div class="flex items-center justify-center gap-1 mt-1 text-[10px] font-bold"><span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">${presentCount} Present</span></div>`;
+                if (presentCount > 0 || excusedCount > 0) {
+                    badgeHtml += `<div class="flex items-center justify-center gap-1 mt-1 text-[10px] font-bold flex-wrap">`;
+                    if (presentCount > 0) badgeHtml += `<span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400">${presentCount} P</span>`;
+                    if (excusedCount > 0) badgeHtml += `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">${excusedCount} E</span>`;
+                    badgeHtml += `</div>`;
                 } else {
                     badgeHtml += `<div class="text-[10px] text-slate-600 italic mt-1">No records</div>`;
                 }
@@ -810,8 +815,15 @@
             let dayRecord = state.attendance[selectedDateStr];
 
             state.players.forEach(pl => {
-                let isPresent = dayRecord[pl.id] === 'Present';
-                let presentClass = isPresent ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/40' : 'bg-slate-900 text-slate-400 hover:bg-slate-800';
+                let status = dayRecord[pl.id]; // 'Present', 'Excused', or undefined
+                
+                let presentClass = status === 'Present' 
+                    ? 'bg-emerald-600 text-white shadow-sm ring-2 ring-emerald-500/40' 
+                    : 'bg-slate-900 text-slate-400 hover:bg-slate-800';
+
+                let excusedClass = status === 'Excused' 
+                    ? 'bg-amber-600 text-white shadow-sm ring-2 ring-amber-500/40' 
+                    : 'bg-slate-900 text-slate-400 hover:bg-slate-800';
 
                 let tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-900/60 transition border-b border-slate-800/40";
@@ -819,9 +831,12 @@
                     <td class="py-3 px-4 font-bold text-tennis-400">#${pl.id}</td>
                     <td class="py-3 px-6 font-bold text-white">${pl.name}</td>
                     <td class="py-3 px-6 text-center">
-                        <div class="inline-flex rounded-xl p-1 bg-slate-950 border border-slate-800 gap-1">
-                            <button onclick="togglePlayerAttendance(${pl.id})" class="px-5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 mx-auto ${presentClass}">
+                        <div class="inline-flex rounded-xl p-1 bg-slate-950 border border-slate-800 gap-1.5 justify-center">
+                            <button onclick="setPlayerAttendance(${pl.id}, 'Present')" class="px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${presentClass}">
                                 <i class="fa-solid fa-check"></i> Present
+                            </button>
+                            <button onclick="setPlayerAttendance(${pl.id}, 'Excused')" class="px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${excusedClass}">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Excused
                             </button>
                         </div>
                     </td>
@@ -830,14 +845,14 @@
             });
         }
 
-        window.togglePlayerAttendance = function(playerId) {
+        window.setPlayerAttendance = function(playerId, statusToSet) {
             if (!selectedDateStr) return;
             if (!state.attendance[selectedDateStr]) state.attendance[selectedDateStr] = {};
             
-            if (state.attendance[selectedDateStr][playerId] === 'Present') {
-                delete state.attendance[selectedDateStr][playerId];
+            if (state.attendance[selectedDateStr][playerId] === statusToSet) {
+                delete state.attendance[selectedDateStr][playerId]; // Toggle off if already selected
             } else {
-                state.attendance[selectedDateStr][playerId] = 'Present';
+                state.attendance[selectedDateStr][playerId] = statusToSet;
             }
 
             persistState();
@@ -845,16 +860,16 @@
             renderCalendar();
         };
 
-        window.markAllAttendance = function(status) {
+        window.markAllAttendance = function(statusToSet) {
             if (!selectedDateStr) return;
             if (!state.attendance[selectedDateStr]) state.attendance[selectedDateStr] = {};
             state.players.forEach(pl => {
-                state.attendance[selectedDateStr][pl.id] = status;
+                state.attendance[selectedDateStr][pl.id] = statusToSet;
             });
             persistState();
             renderDailyAttendanceTable();
             renderCalendar();
-            showToast(`Marked all players as Present for ${selectedDateStr}`, "success");
+            showToast(`Marked all players as ${statusToSet} for ${selectedDateStr}`, "success");
         };
 
         window.clearAllAttendance = function() {
