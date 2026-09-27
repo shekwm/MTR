@@ -43,59 +43,29 @@
                 </div>
             </div>
 
-            <!-- Desktop Navigation (Attendance First) -->
+            <!-- Desktop Navigation -->
             <nav class="hidden md:flex items-center gap-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800">
                 <button id="nav-attendance" onclick="switchTab('attendance')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-tennis-600 text-white shadow-sm flex items-center gap-2"><i class="fa-solid fa-calendar-check"></i> Attendance</button>
                 <button id="nav-standings" onclick="switchTab('standings')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-2"><i class="fa-solid fa-trophy"></i> Standings</button>
                 <button id="nav-fixtures" onclick="switchTab('fixtures')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-2"><i class="fa-solid fa-calendar-days"></i> Fixtures</button>
                 <button id="nav-results" onclick="switchTab('results')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-2"><i class="fa-solid fa-square-poll-vertical"></i> Results</button>
                 <button id="nav-players" onclick="switchTab('players')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-2"><i class="fa-solid fa-users"></i> Players</button>
+                <button id="nav-admin" onclick="switchTab('admin')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Admin</button>
             </nav>
         </div>
 
-        <!-- Mobile Navigation (Attendance First) -->
+        <!-- Mobile Navigation -->
         <div class="md:hidden flex overflow-x-auto px-4 pb-3 gap-2 no-scrollbar border-t border-slate-800/60 pt-2">
             <button id="mob-nav-attendance" onclick="switchTab('attendance')" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap bg-tennis-600 text-white">Attendance</button>
             <button id="mob-nav-standings" onclick="switchTab('standings')" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 bg-slate-900">Standings</button>
             <button id="mob-nav-fixtures" onclick="switchTab('fixtures')" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 bg-slate-900">Fixtures</button>
             <button id="mob-nav-results" onclick="switchTab('results')" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 bg-slate-900">Results</button>
             <button id="mob-nav-players" onclick="switchTab('players')" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 bg-slate-900">Players</button>
+            <button id="mob-nav-admin" onclick="switchTab('admin')" class="px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 bg-slate-900">Admin</button>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 mt-6">
-
-        <!-- Quick Stats Banner -->
-        <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-slate-950/80 rounded-2xl border border-slate-800 p-4 flex items-center justify-between">
-                <div>
-                    <div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Completed Matches</div>
-                    <div id="stat-total-matches" class="text-2xl font-black text-white mt-1">0 / 0</div>
-                </div>
-                <div class="w-10 h-10 rounded-xl bg-slate-900 text-tennis-400 flex items-center justify-center border border-slate-800"><i class="fa-solid fa-circle-check"></i></div>
-            </div>
-            <div class="bg-slate-950/80 rounded-2xl border border-slate-800 p-4 flex items-center justify-between">
-                <div>
-                    <div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Scoring System</div>
-                    <div class="text-sm font-bold text-slate-200 mt-1">Games Won + 2 Pts</div>
-                </div>
-                <div class="w-10 h-10 rounded-xl bg-slate-900 text-tennis-400 flex items-center justify-center border border-slate-800"><i class="fa-solid fa-calculator"></i></div>
-            </div>
-            <div class="bg-slate-950/80 rounded-2xl border border-slate-800 p-4 flex items-center justify-between">
-                <div>
-                    <div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Quick Actions</div>
-                    <div class="flex items-center gap-2 mt-1 flex-wrap">
-                        <button onclick="simulateRemainingMatches()" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-slate-300 rounded-lg border border-slate-700 transition">Simulate</button>
-                        <button onclick="openSyncModal()" class="px-2.5 py-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-xs font-semibold text-indigo-300 rounded-lg border border-indigo-500/30 transition flex items-center gap-1"><i class="fa-solid fa-cloud-arrow-up"></i> Sync</button>
-                        <button onclick="exportData()" class="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-xs font-semibold text-emerald-300 rounded-lg border border-emerald-500/30 transition flex items-center gap-1"><i class="fa-solid fa-file-arrow-down"></i> Export</button>
-                        <button onclick="triggerImport()" class="px-2.5 py-1 bg-sky-500/10 hover:bg-sky-500/20 text-xs font-semibold text-sky-300 rounded-lg border border-sky-500/30 transition flex items-center gap-1"><i class="fa-solid fa-file-arrow-up"></i> Import</button>
-                        <input type="file" id="import-file-input" accept=".json" class="hidden" onchange="importData(event)">
-                        <button onclick="confirmResetData()" class="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-xs font-semibold text-rose-400 rounded-lg border border-rose-500/30 transition">Reset</button>
-                    </div>
-                </div>
-                <div class="w-10 h-10 rounded-xl bg-slate-900 text-tennis-400 flex items-center justify-center border border-slate-800"><i class="fa-solid fa-bolt"></i></div>
-            </div>
-        </div>
 
         <!-- Attendance Calendar View (Default View / First Position) -->
         <section id="view-attendance" class="space-y-6">
@@ -242,6 +212,50 @@
                 </button>
             </div>
             <div id="players-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"></div>
+        </section>
+
+        <!-- Admin View -->
+        <section id="view-admin" class="hidden space-y-6">
+            <div class="bg-slate-950/80 rounded-2xl border border-slate-800 p-6 shadow-xl space-y-6">
+                <div class="border-b border-slate-800 pb-4">
+                    <h2 class="font-bold text-lg text-white flex items-center gap-2"><i class="fa-solid fa-shield-halved text-tennis-400"></i> Admin Management Panel</h2>
+                    <p class="text-xs text-slate-400 mt-1">Configure league scoring rules, inspect completed match statistics, and perform system data actions.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Completed Matches Admin Stat -->
+                    <div class="bg-slate-900/80 rounded-2xl border border-slate-800 p-4 flex items-center justify-between">
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Completed Matches</div>
+                            <div id="stat-total-matches" class="text-2xl font-black text-white mt-1">0 / 0</div>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-slate-950 text-tennis-400 flex items-center justify-center border border-slate-800"><i class="fa-solid fa-circle-check"></i></div>
+                    </div>
+                    <!-- Scoring System Admin Info -->
+                    <div class="bg-slate-900/80 rounded-2xl border border-slate-800 p-4 flex items-center justify-between">
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Scoring System</div>
+                            <div class="text-sm font-bold text-slate-200 mt-1">Games Won + 2 Pts</div>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-slate-950 text-tennis-400 flex items-center justify-center border border-slate-800"><i class="fa-solid fa-calculator"></i></div>
+                    </div>
+                    <!-- Quick Actions Admin Panel -->
+                    <div class="bg-slate-900/80 rounded-2xl border border-slate-800 p-4 flex items-center justify-between">
+                        <div>
+                            <div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Quick Actions</div>
+                            <div class="flex items-center gap-2 mt-1 flex-wrap">
+                                <button onclick="simulateRemainingMatches()" class="px-2.5 py-1 bg-slate-950 hover:bg-slate-800 text-xs font-semibold text-slate-300 rounded-lg border border-slate-700 transition">Simulate</button>
+                                <button onclick="openSyncModal()" class="px-2.5 py-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-xs font-semibold text-indigo-300 rounded-lg border border-indigo-500/30 transition flex items-center gap-1"><i class="fa-solid fa-cloud-arrow-up"></i> Sync</button>
+                                <button onclick="exportData()" class="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-xs font-semibold text-emerald-300 rounded-lg border border-emerald-500/30 transition flex items-center gap-1"><i class="fa-solid fa-file-arrow-down"></i> Export</button>
+                                <button onclick="triggerImport()" class="px-2.5 py-1 bg-sky-500/10 hover:bg-sky-500/20 text-xs font-semibold text-sky-300 rounded-lg border border-sky-500/30 transition flex items-center gap-1"><i class="fa-solid fa-file-arrow-up"></i> Import</button>
+                                <input type="file" id="import-file-input" accept=".json" class="hidden" onchange="importData(event)">
+                                <button onclick="confirmResetData()" class="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-xs font-semibold text-rose-400 rounded-lg border border-rose-500/30 transition">Reset</button>
+                            </div>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-slate-950 text-tennis-400 flex items-center justify-center border border-slate-800"><i class="fa-solid fa-bolt"></i></div>
+                    </div>
+                </div>
+            </div>
         </section>
 
     </main>
@@ -632,7 +646,7 @@
         };
 
         window.switchTab = function(tabName) {
-            const tabs = ['attendance', 'standings', 'fixtures', 'results', 'players'];
+            const tabs = ['attendance', 'standings', 'fixtures', 'results', 'players', 'admin'];
             tabs.forEach(t => {
                 const viewEl = document.getElementById(`view-${t}`);
                 if (viewEl) viewEl.classList.add('hidden');
@@ -820,7 +834,6 @@
             if (!selectedDateStr) return;
             if (!state.attendance[selectedDateStr]) state.attendance[selectedDateStr] = {};
             
-            // Toggle logic: if already Present, remove it (unmark); otherwise set as Present
             if (state.attendance[selectedDateStr][playerId] === 'Present') {
                 delete state.attendance[selectedDateStr][playerId];
             } else {
